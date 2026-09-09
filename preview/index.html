@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#0E2C24" />
+<title>랜딩페이지 미리보기 | landingmaker</title>
+<style>
+  :root {
+    --mint: #00C896;
+    --mint-deep: #00A878;
+    --mint-light: #E6FBF4;
+    --punch: #FF6B35;
+    --ink: #0E2C24;
+    --muted: #5B7A70;
+    --line: #DCEDE6;
+    --bg: #F5FBF8;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 24px 18px 64px; }
+
+  header { padding: 12px 0 26px; }
+  .eyebrow {
+    display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .08em;
+    color: var(--mint-deep); background: var(--mint-light);
+    padding: 6px 12px; border-radius: 999px;
+  }
+  h1 { font-size: 26px; line-height: 1.35; margin: 14px 0 8px; font-weight: 800; }
+  .sub { margin: 0; color: var(--muted); font-size: 14px; }
+
+  .build {
+    margin-top: 18px; padding: 12px 14px; border-radius: 12px;
+    background: #fff; border: 1px solid var(--line); font-size: 13px; color: var(--muted);
+  }
+  .build strong { color: var(--ink); font-weight: 700; }
+  .build .subject {
+    display: block; margin-top: 4px; color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+
+  h2 { font-size: 15px; margin: 34px 0 12px; font-weight: 700; letter-spacing: .01em; }
+
+  .cards { display: grid; gap: 12px; }
+  a.card {
+    display: block; text-decoration: none; color: inherit;
+    background: #fff; border: 1px solid var(--line); border-radius: 16px;
+    padding: 18px 18px 16px;
+    box-shadow: 0 1px 2px rgba(14, 44, 36, .04);
+    transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  }
+  a.card:active { transform: scale(.99); }
+  @media (hover: hover) {
+    a.card:hover { border-color: var(--mint); box-shadow: 0 6px 18px rgba(0, 200, 150, .12); }
+  }
+  .card .top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .tag {
+    font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px;
+    background: var(--mint-light); color: var(--mint-deep);
+  }
+  .tag.draft { background: #FFF1EA; color: var(--punch); }
+  .card h3 { margin: 0; font-size: 17px; font-weight: 700; }
+  .card p { margin: 6px 0 0; font-size: 13px; color: var(--muted); }
+  .card .go { margin-top: 10px; font-size: 13px; font-weight: 700; color: var(--mint-deep); }
+
+  .how {
+    margin-top: 34px; background: #fff; border: 1px solid var(--line);
+    border-radius: 16px; padding: 18px;
+  }
+  .how ol { margin: 10px 0 0; padding-left: 20px; }
+  .how li { margin-bottom: 8px; font-size: 14px; }
+  .how li:last-child { margin-bottom: 0; }
+  .how code {
+    background: var(--mint-light); color: var(--mint-deep);
+    padding: 1px 6px; border-radius: 6px; font-size: 12px;
+    overflow-wrap: anywhere;
+  }
+  .how a { color: var(--mint-deep); font-weight: 700; }
+
+  footer { margin-top: 32px; text-align: center; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="eyebrow">landingmaker</span>
+    <h1>랜딩페이지 미리보기</h1>
+    <p class="sub">폰에서 바로 열어보는 배포본 목록입니다.</p>
+    <div class="build" id="build">
+      <strong>마지막 배포</strong> · {{BUILT_AT}} · {{COMMIT_SHA}}
+      <span class="subject">{{COMMIT_SUBJECT}}</span>
+    </div>
+  </header>
+
+  <h2>완성본</h2>
+  <div class="cards">
+    <a class="card" href="../">
+      <div class="top"><span class="tag">메인</span></div>
+      <h3>요식업 대표님들을 위한 랜딩페이지 제작소</h3>
+      <p>제작소 소개 랜딩페이지. 저장소 루트의 <code>index.html</code>.</p>
+      <div class="go">열기 →</div>
+    </a>
+    <a class="card" href="../guksu/">
+      <div class="top"><span class="tag">가맹모집</span></div>
+      <h3>국수명가 · 배달 국수의 새로운 기준</h3>
+      <p>국수명가 프랜차이즈 가맹모집 랜딩페이지.</p>
+      <div class="go">열기 →</div>
+    </a>
+  </div>
+
+  <h2>디자인 시안 (Claude Design 원본)</h2>
+  <div class="cards">
+    <a class="card" href="../project/index.html">
+      <div class="top"><span class="tag draft">시안</span></div>
+      <h3>project / index.html</h3>
+      <p>핸드오프 당시 열려 있던 기준 시안.</p>
+      <div class="go">열기 →</div>
+    </a>
+    <a class="card" href="../project/%EB%9E%9C%EB%94%A9%ED%8E%98%EC%9D%B4%EC%A7%80%20%EC%A0%9C%EC%9E%91%EC%86%8C.html">
+      <div class="top"><span class="tag draft">시안</span></div>
+      <h3>랜딩페이지 제작소.html</h3>
+      <p>프로젝트 이름 그대로 저장된 시안 파일.</p>
+      <div class="go">열기 →</div>
+    </a>
+  </div>
+
+  <div class="how">
+    <h2 style="margin:0">폰에서 작업하는 법</h2>
+    <ol>
+      <li><a href="https://claude.ai/code">claude.ai/code</a> 를 폰 브라우저에서 열고 <code>solip7131/landingmaker</code> 세션을 시작합니다.</li>
+      <li>바꾸고 싶은 내용을 한국어로 그냥 말합니다. 예: “국수명가 히어로 문구를 이걸로 바꿔줘”.</li>
+      <li>작업이 <code>main</code> 에 머지되면 자동으로 배포됩니다 (보통 1~2분).</li>
+      <li>이 페이지를 새로고침해서 위쪽 <strong>마지막 배포</strong> 시각이 바뀌었는지 확인한 뒤 결과를 봅니다.</li>
+    </ol>
+    <p style="margin:12px 0 0; font-size:13px; color:var(--muted);">맥북은 꺼져 있어도 됩니다. 세션은 클라우드에서 돌아갑니다.</p>
+  </div>
+
+  <footer>이 페이지를 홈 화면에 추가해두면 편합니다.</footer>
+</div>
+
+<script>
+  // 배포 파이프라인을 거치지 않고 로컬에서 열었을 때의 표시.
+  var build = document.getElementById('build');
+  if (build.textContent.indexOf('{{') !== -1) {
+    build.innerHTML = '<strong>로컬 미리보기</strong> · 아직 배포되지 않은 파일입니다.';
+  }
+</script>
+</body>
+</html>

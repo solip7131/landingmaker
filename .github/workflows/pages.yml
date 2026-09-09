@@ -1,0 +1,72 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build site
+        run: |
+          set -euo pipefail
+          rm -rf _site
+          mkdir -p _site
+          # 공개할 것만 복사한다. chats/(대화 기록)와 저장소 메타 파일은 배포하지 않는다.
+          tar -cf - \
+            --exclude='./.git' \
+            --exclude='./.github' \
+            --exclude='./chats' \
+            --exclude='./docs' \
+            --exclude='./_site' \
+            --exclude='./README.md' \
+            . | tar -xf - -C _site
+          # Jekyll 처리를 끄지 않으면 밑줄로 시작하는 경로가 사라진다.
+          touch _site/.nojekyll
+          # 미리보기 허브에 배포 시각과 커밋을 새겨 넣는다.
+          BUILT_AT="$(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M') KST"
+          SHORT_SHA="$(git rev-parse --short HEAD)"
+          SUBJECT="$(git log -1 --pretty=%s)"
+          python3 - "$BUILT_AT" "$SHORT_SHA" "$SUBJECT" <<'PY'
+          import html, pathlib, sys
+
+          built_at, sha, subject = sys.argv[1:4]
+          path = pathlib.Path("_site/preview/index.html")
+          text = path.read_text(encoding="utf-8")
+          for key, value in {
+              "{{BUILT_AT}}": built_at,
+              "{{COMMIT_SHA}}": sha,
+              "{{COMMIT_SUBJECT}}": subject,
+          }.items():
+              text = text.replace(key, html.escape(value))
+          path.write_text(text, encoding="utf-8")
+          PY
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

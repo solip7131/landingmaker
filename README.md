@@ -1,5 +1,8 @@
 # CODING AGENTS: READ THIS FIRST
 
+> **📱 폰으로 작업하려면** → [`docs/phone-workflow.md`](docs/phone-workflow.md)
+> 배포된 페이지 목록: <https://solip7131.github.io/landingmaker/preview/>
+
 This is a **handoff bundle** from Claude Design (claude.ai/design).
 
 A user mocked up designs in HTML/CSS/JS using an AI design tool, then exported this bundle so a coding agent can implement the designs for real.
