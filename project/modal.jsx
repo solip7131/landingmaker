@@ -67,6 +67,11 @@ function CheckGroup({ values, onToggle, options }) {
 // ---- the modal ----
 function ApplyModal({ open, onClose }) {
   const [submitted, setSubmitted] = useState(false);
+  const overlayRef = useRef(null);
+  const sheetRef = useRef(null);
+  // `mounted` outlives `open` so the sheet can animate out before it unmounts.
+  const [mounted, setMounted] = useState(open);
+  useEffect(() => { if (open) setMounted(true); }, [open]);
   const [form, setForm] = useState({
     brand: '', category: '', stores: '', exp: '', target: '', cost: '',
     strength: '', channels: [], timing: '', phone: '', name: '',
@@ -76,27 +81,54 @@ function ApplyModal({ open, onClose }) {
 
   // lock body scroll + esc to close
   useEffect(() => {
-    if (open) {
+    if (mounted) {
       document.body.style.overflow = 'hidden';
       const onKey = (e) => e.key === 'Escape' && onClose();
       window.addEventListener('keydown', onKey);
       return () => { document.body.style.overflow = ''; window.removeEventListener('keydown', onKey); };
     }
-  }, [open, onClose]);
+  }, [mounted, onClose]);
 
   // reset success state shortly after close
   useEffect(() => { if (!open) { const t = setTimeout(() => setSubmitted(false), 300); return () => clearTimeout(t); } }, [open]);
 
-  if (!open) return null;
+  // Motion drives both directions. The CSS keyframes only ever covered the
+  // entrance, so closing used to be an instant cut; the spring also gives the
+  // sheet weight on the way in, which `cubic-bezier` can only approximate.
+  useEffect(() => {
+    if (!mounted) return;
+    const M = getMotion();
+    const overlay = overlayRef.current;
+    const sheet = sheetRef.current;
+    if (!M || !overlay || !sheet) { if (!open) setMounted(false); return; }
+
+    if (open) {
+      M.animate(overlay, { opacity: [0, 1] }, { duration: 0.25, ease: 'easeOut' });
+      M.animate(sheet, { opacity: [0, 1], y: [28, 0], scale: [0.96, 1] },
+        { type: 'spring', stiffness: 420, damping: 34, mass: 0.9 });
+      return;
+    }
+
+    const fadeOverlay = M.animate(overlay, { opacity: 0 }, { duration: 0.18, ease: 'easeIn' });
+    const fadeSheet = M.animate(sheet, { opacity: 0, y: 24, scale: 0.97 }, { duration: 0.2, ease: 'easeIn' });
+    let cancelled = false;
+    Promise.all([fadeOverlay.finished, fadeSheet.finished])
+      .catch(() => {})
+      .then(() => { if (!cancelled) setMounted(false); });
+    return () => { cancelled = true; fadeOverlay.stop(); fadeSheet.stop(); };
+  }, [open, mounted]);
+
+  if (!mounted) return null;
 
   const canSubmit = form.brand && form.phone && form.name;
+  const motionDriven = !!getMotion();
   const onSubmit = (e) => { e.preventDefault(); if (!canSubmit) return; setSubmitted(true); };
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center">
-      <div className="absolute inset-0 bg-ink/55 backdrop-blur-sm overlay-in" onClick={onClose}></div>
+      <div ref={overlayRef} className={`absolute inset-0 bg-ink/55 backdrop-blur-sm ${motionDriven ? '' : 'overlay-in'}`} onClick={onClose}></div>
 
-      <div className="relative w-full sm:max-w-xl max-h-[92vh] sm:max-h-[88vh] bg-white rounded-t-[28px] sm:rounded-[28px] shadow-2xl sheet-in flex flex-col overflow-hidden">
+      <div ref={sheetRef} className={`relative w-full sm:max-w-xl max-h-[92vh] sm:max-h-[88vh] bg-white rounded-t-[28px] sm:rounded-[28px] shadow-2xl flex flex-col overflow-hidden ${motionDriven ? '' : 'sheet-in'}`}>
         {submitted ? (
           <SuccessView onClose={onClose} />
         ) : (

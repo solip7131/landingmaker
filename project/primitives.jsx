@@ -1,7 +1,16 @@
 // ============================================================
 //  primitives.jsx — shared hooks + small building blocks
 // ============================================================
-const { useState, useEffect, useRef, useCallback } = React;
+const { useState, useEffect, useLayoutEffect, useRef, useCallback } = React;
+
+// ---- animation libraries ----------------------------------------------------
+// Anime.js and Motion both load from a CDN, so every caller must survive them
+// being absent (blocked CDN, offline preview) — the page keeps its CSS-only
+// behaviour in that case. Reduced-motion users are treated the same way.
+const prefersReducedMotion = () =>
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const getAnime = () => (prefersReducedMotion() ? null : window.anime || null);
+const getMotion = () => (prefersReducedMotion() ? null : window.Motion || null);
 
 // Reveal-on-scroll: stamps `.in` once the node enters the viewport.
 // Uses getBoundingClientRect + scroll listener (IntersectionObserver is
@@ -99,4 +108,5 @@ function Blob({ className = '', color = '#00C896' }) {
 }
 
 Object.assign(window, { useRevealRoot, Counter, SectionHead, Blob,
-  React, useState, useEffect, useRef, useCallback });
+  prefersReducedMotion, getAnime, getMotion,
+  React, useState, useEffect, useLayoutEffect, useRef, useCallback });

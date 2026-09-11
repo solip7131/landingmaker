@@ -40,7 +40,30 @@ function Nav({ onOpen }) {
 }
 
 // ---------------- 1. HERO ----------------
+// Anime.js draws the punch-coloured bar under the headline like a marker
+// stroke, timed to land just after the `.reveal` headline has settled.
+// Without Anime.js the bar simply renders at full width, as it always did.
+function useMarkerStroke(ref, delay = 620) {
+  // useLayoutEffect, not useEffect: the bar must be collapsed before the first
+  // paint, otherwise it flashes at full width for one frame and then snaps.
+  useLayoutEffect(() => {
+    const anime = getAnime();
+    const el = ref.current;
+    if (!anime || !el) return;
+    anime.utils.set(el, { scaleX: 0, transformOrigin: '0% 50%' });
+    const stroke = anime.animate(el, {
+      scaleX: [0, 1],
+      duration: 780,
+      delay,
+      ease: 'outExpo',
+    });
+    return () => stroke.revert();
+  }, [ref, delay]);
+}
+
 function Hero({ onOpen }) {
+  const markerRef = useRef(null);
+  useMarkerStroke(markerRef);
   const particles = useRef(
     Array.from({ length: 18 }).map((_, i) => ({
       id: i,
@@ -78,7 +101,7 @@ function Hero({ onOpen }) {
           사장님, 가맹점 문의가<br />
           <span className="relative inline-block">
             <span className="relative z-10">알아서 들어오게</span>
-            <span className="absolute left-0 right-0 bottom-1 h-3 md:h-5 bg-punch/70 rounded-full -z-0"></span>
+            <span ref={markerRef} className="absolute left-0 right-0 bottom-1 h-3 md:h-5 bg-punch/70 rounded-full -z-0"></span>
           </span> 만들어 드릴게요
         </h1>
 
